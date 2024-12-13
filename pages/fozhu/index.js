@@ -15,6 +15,9 @@ Page({
       htuserInfo: {},
       audio: !0,
       bannerAdUnitId: getApp().adConfig.beadsBannerAd,
+      count: 0,
+      text: "加油",
+      mantraText: "南无阿弥陀佛",
     },
     audioContext: null,
     scoreAnimation: null,
@@ -212,7 +215,7 @@ Page({
                   .catch((err) => {
                     console.error("激励视频广告显示失败：", err);
                     wx.showToast({
-                      title: "广告加载失败，请稍后再试",
+                      title: "广告���载失败，请稍后再试",
                       icon: "none",
                       duration: 2000
                     });
@@ -263,7 +266,7 @@ Page({
     onShareAppMessage: function () {
       return {
         title: wx.getStorageSync("fz" + this.getCurrentDate())
-          ? "今日我已���德+" +
+          ? "今日我已功德+" +
             wx.getStorageSync("fz" + this.getCurrentDate()) +
             "，你也一起来用电子念珠吧！"
           : "我发现了一款不错的解压神器！快来试一试吧！",
@@ -303,7 +306,7 @@ Page({
         });
         this.innerAudioContext.src = "res/sound.mp3";
         this.innerAudioContext.onError((err) => {
-          console.error("��频加载失败：", err);
+          console.error("视频频加载失败：", err);
           wx.showToast({
             title: "音频加载失败",
             icon: "none",

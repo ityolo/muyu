@@ -8,6 +8,8 @@
       count: 0,
       audio: !0,
       opengo: !0,
+      text: "功德+1",
+      isPlaying: false,
     },
     onShow: function () {
       if (
@@ -36,7 +38,7 @@
         clearInterval(this.timer);
       }
       this.setData({
-        auto: false
+        auto: false,
       });
       if (this.showInterAd) {
         this.showInterAd();
@@ -46,7 +48,7 @@
       var t = this;
       wx.showModal({
         title: "提示",
-        content: "是否重置数据��",
+        content: "是否重置数据?",
         success: function (e) {
           e.confirm
             ? (wx.getStorageSync("my" + t.getCurrentDate()) &&
@@ -71,15 +73,15 @@
       var n = this;
       if (getApp().adConfig.videoAd && wx.createRewardedVideoAd) {
         e = wx.createRewardedVideoAd({
-          adUnitId: getApp().adConfig.videoAd
+          adUnitId: getApp().adConfig.videoAd,
         });
-        
+
         e.onLoad(() => {
           this.setData({ adLoaded: true });
         });
-        
+
         e.onError((err) => {
-          console.error('激励视频广告加载失败：', err);
+          console.error("激励视频广告加载失败：", err);
           this.setData({ adLoaded: false });
         });
 
@@ -88,16 +90,16 @@
             wx.setStorageSync("my-key", this.getCurrentDate());
             this.timer = setInterval(() => this.konck(), 700);
             this.setData({
-              auto: true
+              auto: true,
             });
             wx.showToast({
               title: "解锁成功",
-              icon: "success"
+              icon: "success",
             });
           } else {
             wx.showToast({
               title: "完整看完才能解锁哦~",
-              icon: "none"
+              icon: "none",
             });
           }
         });
@@ -106,16 +108,18 @@
       let lastInterAdShowTime = 0;
       if (getApp().adConfig.interAd && wx.createInterstitialAd) {
         t = wx.createInterstitialAd({
-          adUnitId: getApp().adConfig.interAd
+          adUnitId: getApp().adConfig.interAd,
         });
-        
+
         this.tryShowInterAd = () => {
           const now = Date.now();
           const config = getApp().adConfig.interAdConfig;
-          if (now - lastInterAdShowTime >= config.minInterval && 
-              Math.random() < config.probability) {
+          if (
+            now - lastInterAdShowTime >= config.minInterval &&
+            Math.random() < config.probability
+          ) {
             t.show().catch((err) => {
-              console.error('插屏广告展示失败：', err);
+              console.error("插屏广告展示失败：", err);
             });
             lastInterAdShowTime = now;
           }
@@ -160,14 +164,17 @@
     },
     autoplay: function () {
       if (!this.data.auto) {
-        if (wx.getStorageSync("my-key") && wx.getStorageSync("my-key") == this.getCurrentDate()) {
+        if (
+          wx.getStorageSync("my-key") &&
+          wx.getStorageSync("my-key") == this.getCurrentDate()
+        ) {
           this.timer = setInterval(() => this.konck(), 700);
           this.setData({
-            auto: true
+            auto: true,
           });
           return;
         }
-        
+
         if (e) {
           wx.showModal({
             title: "未解锁",
@@ -179,28 +186,31 @@
                   e.load()
                     .then(() => e.show())
                     .catch((err) => {
-                      console.error('激励视频广告显示失败：', err);
+                      console.error("激励视频广告显示失败：", err);
                       wx.showToast({
-                        title: '广告加载失败，请稍后再试',
-                        icon: 'none',
-                        duration: 2000
+                        title: "广告加载失败，请稍后再试",
+                        icon: "none",
+                        duration: 2000,
                       });
                     });
                 });
               }
-            }
+            },
           });
         } else {
           wx.showToast({
-            title: '广告功能未初始化，请稍后再试',
-            icon: 'none',
-            duration: 2000
+            title: "广告功能未初始化，请稍后再试",
+            icon: "none",
+            duration: 2000,
           });
         }
       } else {
-        this.timer && clearInterval(this.timer);
+        if (this.timer) {
+          clearInterval(this.timer);
+          this.timer = null;
+        }
         this.setData({
-          auto: false
+          auto: false,
         });
       }
     },
@@ -225,7 +235,7 @@
           ? "今日我已功德+" +
             wx.getStorageSync("my" + this.getCurrentDate()) +
             "，你也一起来敲电子木鱼吧！"
-          : "我发现了一款不错的解压神��！快来试一试吧！",
+          : "我发现了一款不错的解压神器！快来试一试吧！",
         path: "/pages/index/index",
         imageUrl: "/images/index/share.jpg",
       };
@@ -268,13 +278,13 @@
         .step()
         .step()
         .top("51%"),
-      this.aniamtion.rotate(0).step().rotate(40).step(),
-      this.setData({
-        animationData: this.aniamtion.export(),
-        [n]: this["agd" + e].export(),
-        count: this.data.count + 1,
-      }),
-      wx.setStorageSync("my" + this.getCurrentDate(), this.data.count);
-    }
+        this.aniamtion.rotate(0).step().rotate(40).step(),
+        this.setData({
+          animationData: this.aniamtion.export(),
+          [n]: this["agd" + e].export(),
+          count: this.data.count + 1,
+        }),
+        wx.setStorageSync("my" + this.getCurrentDate(), this.data.count);
+    },
   });
 })();

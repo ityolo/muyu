@@ -139,11 +139,7 @@
         });
         rewardedVideoAd.onClose((res) => {
           if (res && res.isEnded) {
-            this.timer = setInterval(this.konck, 2000);
-            this.setData({
-              auto: true
-            });
-            wx.setStorageSync("my-key", this.getCurrentDate());
+            wx.setStorageSync("sb-key", this.getCurrentDate());
             wx.showToast({
               title: "解锁成功",
               icon: "success"
@@ -175,11 +171,10 @@
       }
     },
     overvideo: function () {
-      wx.setStorageSync("my-key", this.getCurrentDate());
-      this.konck();
-      this.timer = setInterval(this.konck, 2000);
-      this.setData({
-        auto: true,
+      wx.setStorageSync("sb-key", this.getCurrentDate());
+      wx.showToast({
+        title: "解锁成功",
+        icon: "success"
       });
     },
     onHide: function () {
@@ -188,6 +183,7 @@
       }
       if (this.timer) {
         clearInterval(this.timer);
+        this.timer = null;
       }
       this.setData({
         auto: false
@@ -261,50 +257,51 @@
       }
     },
     autoplay: function () {
-      var t = this;
-      if (this.data.auto) {
-        this.timer && clearInterval(this.timer);
+      if (!this.data.auto) {
+        if (wx.getStorageSync("sb-key") && 
+            wx.getStorageSync("sb-key") == this.getCurrentDate()) {
+          this.timer = setInterval(() => this.konck(), 2000);
+          this.setData({
+            auto: true
+          });
+          return;
+        }
+        if (rewardedVideoAd) {
+          wx.showModal({
+            title: "未解锁",
+            content: "看一段视频，可在今天无限使用此功能",
+            confirmColor: "#439057",
+            success: (res) => {
+              if (res.confirm) {
+                rewardedVideoAd.show().catch(() => {
+                  rewardedVideoAd.load()
+                    .then(() => rewardedVideoAd.show())
+                    .catch(err => {
+                      console.error('激励视频广告显示失败：', err);
+                      wx.showToast({
+                        title: '广告加载失败，请稍后再试',
+                        icon: 'none',
+                        duration: 2000
+                      });
+                    });
+                });
+              }
+            }
+          });
+        } else {
+          wx.showToast({
+            title: '广告功能未初始化，请稍后再试',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      } else {
+        if (this.timer) {
+          clearInterval(this.timer);
+          this.timer = null;
+        }
         this.setData({
           auto: false
-        });
-        return;
-      }
-
-      if (wx.getStorageSync("my-key") && wx.getStorageSync("my-key") == this.getCurrentDate()) {
-        this.timer = setInterval(() => this.konck(), 2000);
-        this.setData({
-          auto: true
-        });
-        return;
-      }
-
-      if (rewardedVideoAd) {
-        wx.showModal({
-          title: "未解锁",
-          content: "看一段视频，可在今天无限使用此功能",
-          confirmColor: "#439057",
-          success: function(n) {
-            if (n.confirm) {
-              rewardedVideoAd.show().catch(() => {
-                rewardedVideoAd.load()
-                  .then(() => rewardedVideoAd.show())
-                  .catch(err => {
-                    console.error('激励视频广告显示失败：', err);
-                    wx.showToast({
-                      title: '广告加载失败，请稍后再试',
-                      icon: 'none',
-                      duration: 2000
-                    });
-                  });
-              });
-            }
-          }
-        });
-      } else {
-        wx.showToast({
-          title: '广告功能未初始化，请稍后再试',
-          icon: 'none',
-          duration: 2000
         });
       }
     },
